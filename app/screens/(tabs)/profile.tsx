@@ -32,17 +32,25 @@ const Profile = () => {
   const { session } = useSession();
   const { pets } = usePet();
   const [image, setImage] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [bio, setBio] = useState(session?.user.user_metadata?.bio || "");
   const bioInputRef = useRef<TextInput>(null);
 
-  
+
   // Add this effect to refresh bio when screen focuses
   useFocusEffect(
     useCallback(() => {
-      setBio(session?.user.user_metadata?.bio || "");
-    }, [session?.user.user_metadata?.bio])
+      const fetchAvatar = async () => {
+        const { data, error } = await supabase.auth.getUser();
+        if (!error && data.user) {
+          setAvatarUrl(data.user.user_metadata?.avatar_url || null);
+        }
+      };
+      fetchAvatar();
+    }, [])
   );
+
 
   const sheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["33%"], []);
@@ -67,35 +75,48 @@ const Profile = () => {
     try {
       setLoading(true);
       if (!session?.user?.id) throw new Error("No user ID");
-  
-      const response = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
-      const fileExt = uri.split('.').pop();
+
+      const fileExt = uri.split('.').pop() || 'jpg';
       const fileName = `user_${session.user.id}.${fileExt}`;
       const filePath = `${session.user.id}/avatar/${fileName}`;
-  
+
+      // Read the file as a base64 string
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      // Convert base64 to Uint8Array
+      const arrayBuffer = new Uint8Array(
+        atob(base64)
+          .split('')
+          .map(char => char.charCodeAt(0))
+      ).buffer;
+
+      // Upload the file directly using the array buffer
       const { error: uploadError } = await supabase.storage
         .from('usersavatar')
-        .upload(filePath, response, {
+        .upload(filePath, arrayBuffer, {
           contentType: `image/${fileExt}`,
           upsert: true,
           cacheControl: '3600',
         });
-  
+
       if (uploadError) throw uploadError;
-  
+
       const { data } = supabase.storage.from('usersavatar').getPublicUrl(filePath);
-      const photoUrl = data.publicUrl;
-  
+      const photoUrl = `${data.publicUrl}?t=${Date.now()}`;
+
       const { error: updateError } = await supabase.auth.updateUser({
-        data: {
-          avatar_url: photoUrl,
-        },
+        data: { avatar_url: photoUrl },
       });
-  
+
       if (updateError) throw updateError;
-  
+
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (!userError && userData.user) {
+        setAvatarUrl(userData.user.user_metadata?.avatar_url || null);
+      }
+
       alert("Profile picture updated successfully!");
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -104,7 +125,7 @@ const Profile = () => {
       setLoading(false);
     }
   };
-  
+
 
   const backDrop = useCallback(
     (props: any) => (
@@ -175,16 +196,20 @@ const Profile = () => {
                     <Image
                       source={{ uri: image }}
                       style={styles.profilePic}
+                      onError={() => setImage(null)}
                     />
-                  ) : session?.user.user_metadata['avatar_url'] ? (
+                  ) : avatarUrl ? (
                     <Image
-                      source={{ uri: session.user.user_metadata.avatar_url }}
+                      source={{ uri: avatarUrl }}
                       style={styles.profilePic}
+                      onError={() => setAvatarUrl(null)}
                     />
                   ) : (
-                    <Ionicons style={styles.profileIcon}
+                    <Ionicons
+                      style={styles.profileIcon}
                       name="person"
                       size={dimensions.screenWidth * 0.12}
+                      color="white"
                     />
                   )}
                 </View>

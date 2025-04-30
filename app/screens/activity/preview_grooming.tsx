@@ -12,6 +12,7 @@ import { usePet } from '../../context/pet_context'
 import { useGrooming } from '../../context/grooming_context'
 import SvgValue from '../../hooks/fetchSvg'
 import TitleValue from '../../components/list/title_value'
+import Button1 from '../../components/buttons/button1'
 
 
 const PreviewGrooming = () => {
@@ -186,6 +187,18 @@ const PreviewGrooming = () => {
         </TouchableOpacity>
         <Ionicons name='ellipsis-horizontal' size={dimensions.screenWidth * 0.05} color="#fff" />
       </View>
+      {
+        parsedBooking?.status == 'completed' && (
+          <View style={{ position: 'absolute', bottom: dimensions.screenHeight * 0.03, width: '100%', paddingHorizontal: dimensions.screenWidth * 0.06 }}>
+            <Button1
+              title='Add a Review'
+              isPrimary={false}
+              borderRadius={15}
+              onPress={() => router.push('../reviews/reviews')}
+            />
+          </View>
+        )
+      }
     </View>
   )
 }
