@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "furryfresh",
+    "slug": "furryfresh",
+    "scheme": "furryfresh",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/furry-fresh-logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#F8F8FF"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/furry-fresh-logo.png",
+        "backgroundColor": "#F8F8FF"
+      },
+      "package": "com.furryfresh24.furryfresh"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "aee1a352-4a76-4c17-bce3-696cc2d0f3aa"
+      }
+    }
+  }
+}
