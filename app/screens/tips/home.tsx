@@ -223,7 +223,7 @@ const Home = () => {
         <TouchableWithoutFeedback onPress={handleBackHome}>
           <View style={styles.coloredBox}>
             <Image
-              source={require('../../assets/images/others/home.png')}
+              source={require('../../assets/images/others/iconHome.png')}
               style={styles.homeIcon}
               resizeMode="contain"
             />
@@ -375,12 +375,12 @@ const Home = () => {
       </View>
 
       <Image
-        source={require('../../assets/images/others/paw1.png')}
+        source={require('../../assets/images/others/designPaw1.png')}
         style={styles.paw1Image}
         resizeMode="contain"
       />
       <Image
-        source={require('../../assets/images/others/paw2.png')}
+        source={require('../../assets/images/others/designPaw2.png')}
         style={styles.paw2Image}
         resizeMode="contain"
       />

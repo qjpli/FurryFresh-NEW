@@ -65,7 +65,7 @@ const Explore = () => {
               <View style={styles.indicator}>
                 <View style={styles.indicatorContent}>
                   <Image
-                    source={require('../../assets/images/others/stars.png')}
+                    source={require('../../assets/images/others/iconStars.png')}
                     style={styles.indicatorIcon}
                     resizeMode="contain"
                   />
@@ -94,7 +94,7 @@ const Explore = () => {
               <View style={styles.indicator}>
                 <View style={styles.indicatorContent}>
                   <Image
-                    source={require('../../assets/images/others/stars.png')}
+                    source={require('../../assets/images/others/iconStars.png')}
                     style={styles.indicatorIcon}
                     resizeMode="contain"
                   />

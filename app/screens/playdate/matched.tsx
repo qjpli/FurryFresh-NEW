@@ -63,7 +63,7 @@ const MatchedScreen = (props: Props) => {
             <Ionicons name='paw' size={dimensions.screenWidth * 0.5} color="#f29430" style={[styles.pawStyle, styles.bottomPaw]} />
 
             <Image 
-              source={require('../../assets/images/others/PetBGMatch.png')}
+              source={require('../../assets/images/others/designMatch.png')}
               style={styles.petBGMatch}
             />
 

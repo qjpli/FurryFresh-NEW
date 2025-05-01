@@ -64,7 +64,7 @@ const GetStarted = () => {
 
       {/* Dog */}
       <Image
-        source={require('../../assets/images/others/dog-hd.png')}
+        source={require('../../assets/images/others/getStartedPlayDateDog.png')}
         style={styles.image}
         resizeMode="contain"
       />
@@ -96,7 +96,7 @@ const GetStarted = () => {
       >
         <Text style={styles.getStartedText}>Get Started</Text>
         <Image
-          source={require('../../assets/images/others/arrow.png')}
+          source={require('../../assets/images/others/iconArrow.png')}
           style={styles.arrowLogo}
           resizeMode="contain"
         />
