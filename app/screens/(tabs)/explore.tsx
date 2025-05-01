@@ -117,11 +117,18 @@ const Explore = () => {
             </View>
           </TouchableOpacity>
 
-          {/* Pet Show Contest */}
+          {/* Minigame */}
           <TouchableOpacity onPress={() => router.push('../minigame/minigame')}>
             <View style={styles.innerBox}>
               <View style={styles.indicator}>
-                <Text style={styles.indicatorText}>COMING SOON!</Text>
+              <View style={styles.indicatorContent}>
+                  <Image
+                    source={require('../../assets/images/others/iconStars.png')}
+                    style={styles.indicatorIcon}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.indicatorText}>NEW</Text>
+                </View>
               </View>
               <View style={styles.colorBox}>
                 <Image
@@ -131,8 +138,8 @@ const Explore = () => {
                 />
               </View>
               <View style={styles.textContainer}>
-                <Text style={styles.innerTextBlack}>Pet Show Contest</Text>
-                <Text style={styles.innerTextGray}>Activities</Text>
+                <Text style={styles.innerTextBlack}>Minigame</Text>
+                <Text style={styles.innerTextGray}>Game</Text>
               </View>
             </View>
           </TouchableOpacity>

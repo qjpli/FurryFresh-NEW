@@ -200,6 +200,27 @@ const Minigame = () => {
         </Animated.View>
       </PanGestureHandler>
 
+            <Image
+              source={require('../../assets/images/others/designPaw1.png')}
+              style={styles.paw1Image}
+              resizeMode="contain"
+            />
+            <Image
+              source={require('../../assets/images/others/designPaw2.png')}
+              style={styles.paw2Image}
+              resizeMode="contain"
+            />
+            <Image
+              source={require('../../assets/images/others/designPaw1.png')}
+              style={styles.paw3Image}
+              resizeMode="contain"
+            />
+            <Image
+              source={require('../../assets/images/others/designPaw2.png')}
+              style={styles.paw4Image}
+              resizeMode="contain"
+            />
+
       {gamePaused && (
         <View style={styles.overlay}>
           <View style={styles.centeredBox}>
@@ -340,6 +361,35 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
   },
+  paw1Image: {
+    position: 'absolute',
+    bottom: -10,
+    left: -10,
+    width: 80,
+    height: 80,
+  },
+  paw2Image: {
+    position: 'absolute',
+    top: 0,
+    right: -30,
+    width: 200,
+    height: 200,
+  },
+  paw3Image: {
+    position: 'absolute',
+    bottom: 300,
+    left: 10,
+    width: 100,
+    height: 200,
+  },
+  paw4Image: {
+    position: 'absolute',
+    top: 530,
+    right: -30,
+    width: 150,
+    height: 150,
+  },
+
 });
 
 export default Minigame;
