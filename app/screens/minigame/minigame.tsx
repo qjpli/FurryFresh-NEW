@@ -22,14 +22,17 @@ const Minigame = () => {
 
   const [fishImage] = useState(require('../../assets/images/others/miniGameFish.png'));
   const [logoImage] = useState(require('../../assets/images/general/furry-fresh-logo.png'));
+  const [heartImage] = useState(require('../../assets/images/others/miniGameHeartThree.png'));
 
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(-dimensions.screenHeight * 0.1);
   const fishPosX = useSharedValue(0);
+  const fallDuration = useSharedValue(2000);
 
   const [score, setScore] = useState(0);
   const [lastScore, setLastScore] = useState(0);
   const [gamePaused, setGamePaused] = useState(false);
+  const [countdown, setCountdown] = useState<string | null>(null);
 
   const catContainerWidth = dimensions.screenWidth * 0.2;
   const platformWidth = dimensions.screenWidth * 0.8;
@@ -39,19 +42,25 @@ const Minigame = () => {
   const fishWidth = dimensions.screenWidth * 0.15;
   const fishHeight = dimensions.screenHeight * 0.05;
 
+  const calculateFallDuration = (score: number) => {
+    const speedLevel = Math.floor(score / 5);
+    return Math.max(800, 2000 - speedLevel * 200);
+  };
+
   const startFishFall = () => {
-    if (gamePaused) return;
+    if (gamePaused || countdown !== null) return;
+    fallDuration.value = calculateFallDuration(score);
     translateY.value = withTiming(
       dimensions.screenHeight - platformHeight - dimensions.screenHeight * 0.07,
       {
-        duration: 2000,
+        duration: fallDuration.value,
         easing: Easing.linear,
       }
     );
   };
 
   const resetFish = () => {
-    if (gamePaused) return;
+    if (gamePaused || countdown !== null) return;
     const maxLeft = platformWidth - fishWidth;
     const randomLeftWithinPlatform = Math.random() * maxLeft;
     fishPosX.value = platformStartX + randomLeftWithinPlatform;
@@ -67,25 +76,27 @@ const Minigame = () => {
   };
 
   const handleFishEaten = () => {
-    if (gamePaused) return;
+    if (gamePaused || countdown !== null) return;
     runOnJS(setScore)(prev => prev + 1);
     resetFish();
     onCatEatFish();
   };
 
   const handleFishMissed = () => {
-    if (gamePaused) return;
+    if (gamePaused || countdown !== null) return;
     runOnJS(setLastScore)(score);
     resetFish();
     runOnJS(setGamePaused)(true);
   };
 
   useEffect(() => {
-    resetFish();
-  }, []);
+    if (!gamePaused && countdown === null) {
+      resetFish();
+    }
+  }, [gamePaused, countdown]);
 
   const onGestureEvent = (event: PanGestureHandlerGestureEvent) => {
-    if (gamePaused) return;
+    if (gamePaused || countdown !== null) return;
     const { translationX } = event.nativeEvent;
     const maxTranslationX = platformWidth - catContainerWidth;
     const minTranslationX = 0;
@@ -98,7 +109,7 @@ const Minigame = () => {
   };
 
   const onHandlerStateChange = (event: any) => {
-    if (gamePaused) return;
+    if (gamePaused || countdown !== null) return;
     if (event.nativeEvent.state === 5) {
       translateX.value = withSpring(translateX.value);
     }
@@ -140,12 +151,36 @@ const Minigame = () => {
     router.push('../../screens/(tabs)/home');
   };
 
-  const handleRestart = () => {
-    router.push('../minigame/minigame');
+  const startCountdown = () => {
+    const sequence = ['3', '2', '1', 'GO!'];
+    let index = 0;
+    setCountdown(sequence[index]);
+    const interval = setInterval(() => {
+      index++;
+      if (index >= sequence.length) {
+        clearInterval(interval);
+        setCountdown(null);
+        setGamePaused(false);
+        setScore(0);
+        resetFish();
+      } else {
+        setCountdown(sequence[index]);
+      }
+    }, 1000);
+  };
+
+  const restartGame = () => {
+    setScore(0);
+    setLastScore(0);
+    setGamePaused(false);
+    setCountdown('3');
+    startCountdown();
   };
 
   return (
     <View style={styles.container}>
+      <Image source={heartImage} style={styles.heart} />
+
       <Text style={styles.scoreText}>{score}</Text>
 
       <Animated.Image
@@ -174,16 +209,22 @@ const Minigame = () => {
             <View style={styles.smallBoxRow}>
               <TouchableWithoutFeedback onPress={handleBackHome}>
                 <View style={styles.coloredBox}>
-                   <Text style={styles.smallBoxText}>Back To Home</Text>
+                  <Text style={styles.smallBoxText}>Back To Home</Text>
                 </View>
               </TouchableWithoutFeedback>
-              <TouchableWithoutFeedback onPress={handleRestart}>
+              <TouchableWithoutFeedback onPress={restartGame}>
                 <View style={[styles.coloredBox, styles.restartBox]}>
                   <Text style={styles.smallBoxText}>Restart</Text>
                 </View>
               </TouchableWithoutFeedback>
             </View>
           </View>
+        </View>
+      )}
+
+      {countdown !== null && (
+        <View style={styles.countdownOverlay}>
+          <Text style={styles.countdownText}>{countdown}</Text>
         </View>
       )}
     </View>
@@ -194,6 +235,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#D0DFF4',
+  },
+  heart: {
+    width: dimensions.screenWidth * 0.,
+    height: dimensions.screenHeight * 0.06,
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    resizeMode: 'contain',
   },
   scoreText: {
     fontSize: 36,
@@ -218,7 +267,7 @@ const styles = StyleSheet.create({
     left: dimensions.screenWidth * 0.1,
     width: dimensions.screenWidth * 0.2,
     height: dimensions.screenHeight * 0.12,
-    backgroundColor: '#F1C1C1',
+    backgroundColor: '#D0DFF4',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: dimensions.screenWidth * 0.02,
@@ -279,6 +328,17 @@ const styles = StyleSheet.create({
   smallBoxText: {
     fontSize: dimensions.screenWidth * 0.03,
     color: '#fff',
+  },
+  countdownOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  countdownText: {
+    fontSize: 80,
+    fontWeight: 'bold',
+    color: 'white',
   },
 });
 
