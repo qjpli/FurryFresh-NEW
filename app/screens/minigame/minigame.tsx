@@ -11,6 +11,7 @@ import Animated, {
   useAnimatedReaction,
   runOnJS
 } from 'react-native-reanimated';
+import { Audio } from 'expo-av';
 import dimensions from '../../utils/sizing';
 
 const Minigame = () => {
@@ -22,7 +23,6 @@ const Minigame = () => {
 
   const [fishImage] = useState(require('../../assets/images/others/miniGameFish.png'));
   const [logoImage] = useState(require('../../assets/images/general/furry-fresh-logo.png'));
-  const [heartImage] = useState(require('../../assets/images/others/miniGameHeartThree.png'));
 
   const translateX = useSharedValue(0);
   const translateY = useSharedValue(-dimensions.screenHeight * 0.1);
@@ -33,6 +33,8 @@ const Minigame = () => {
   const [lastScore, setLastScore] = useState(0);
   const [gamePaused, setGamePaused] = useState(false);
   const [countdown, setCountdown] = useState<string | null>(null);
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
+  const [musicLost, setMusicLost] = useState<Audio.Sound | null>(null); // Added musicLost sound
 
   const catContainerWidth = dimensions.screenWidth * 0.2;
   const platformWidth = dimensions.screenWidth * 0.8;
@@ -41,6 +43,30 @@ const Minigame = () => {
 
   const fishWidth = dimensions.screenWidth * 0.15;
   const fishHeight = dimensions.screenHeight * 0.05;
+
+  const playMusic = async () => {
+    if (sound) {
+      await sound.unloadAsync();
+    }
+    const { sound: newSound } = await Audio.Sound.createAsync(
+      require('../../assets/audio/musicBackground.mp3'),
+      { isLooping: true, volume: 0.050 }
+    );
+    setSound(newSound);
+    await newSound.playAsync();
+  };
+
+  const playMusicLost = async () => {
+    if (musicLost) {
+      await musicLost.unloadAsync();
+    }
+    const { sound: newMusicLost } = await Audio.Sound.createAsync(
+      require('../../assets/audio/musicLost.mp3'),
+      { volume: 0.030 } // Adjust volume as needed
+    );
+    setMusicLost(newMusicLost);
+    await newMusicLost.playAsync();
+  };
 
   const calculateFallDuration = (score: number) => {
     const speedLevel = Math.floor(score / 5);
@@ -87,6 +113,10 @@ const Minigame = () => {
     runOnJS(setLastScore)(score);
     resetFish();
     runOnJS(setGamePaused)(true);
+    playMusicLost(); // Play the lost music when the fish is missed
+    if (sound) {
+      sound.unloadAsync();
+    }
   };
 
   useEffect(() => {
@@ -163,64 +193,51 @@ const Minigame = () => {
         setGamePaused(false);
         setScore(0);
         resetFish();
+        playMusic(); // Play music after countdown ends
       } else {
         setCountdown(sequence[index]);
       }
     }, 1000);
   };
 
-  const restartGame = () => {
+  const restartGame = async () => {
+    if (musicLost) {
+      await musicLost.unloadAsync(); // Stop the lost music before restarting
+    }
+
     setScore(0);
     setLastScore(0);
     setGamePaused(false);
     setCountdown('3');
-    startCountdown();
+    startCountdown(); // Start countdown after pressing restart
   };
+
+  useEffect(() => {
+    return () => {
+      if (sound) {
+        sound.unloadAsync(); // Clean up the sound when the component unmounts
+      }
+      if (musicLost) {
+        musicLost.unloadAsync(); // Clean up the lost music when the component unmounts
+      }
+    };
+  }, [sound, musicLost]);
 
   return (
     <View style={styles.container}>
-      <Image source={heartImage} style={styles.heart} />
+      <Image source={require('../../assets/images/others/designPaw1.png')} style={styles.paw1Image} />
+      <Image source={require('../../assets/images/others/designPaw2.png')} style={styles.paw2Image} />
+      <Image source={require('../../assets/images/others/designPaw1.png')} style={styles.paw3Image} />
+      <Image source={require('../../assets/images/others/designPaw2.png')} style={styles.paw4Image} />
 
       <Text style={styles.scoreText}>{score}</Text>
-
-      <Animated.Image
-        source={fishImage}
-        style={[styles.fish, fishStyle]}
-        resizeMode="contain"
-      />
-
+      <Animated.Image source={fishImage} style={[styles.fish, fishStyle]} resizeMode="contain" />
       <View style={styles.platformContainer} />
-
-      <PanGestureHandler
-        onGestureEvent={onGestureEvent}
-        onHandlerStateChange={onHandlerStateChange}
-      >
+      <PanGestureHandler onGestureEvent={onGestureEvent} onHandlerStateChange={onHandlerStateChange}>
         <Animated.View style={[styles.catContainer, catContainerStyle]}>
           <Image source={catImage} style={styles.cat} resizeMode="contain" />
         </Animated.View>
       </PanGestureHandler>
-
-            <Image
-              source={require('../../assets/images/others/designPaw1.png')}
-              style={styles.paw1Image}
-              resizeMode="contain"
-            />
-            <Image
-              source={require('../../assets/images/others/designPaw2.png')}
-              style={styles.paw2Image}
-              resizeMode="contain"
-            />
-            <Image
-              source={require('../../assets/images/others/designPaw1.png')}
-              style={styles.paw3Image}
-              resizeMode="contain"
-            />
-            <Image
-              source={require('../../assets/images/others/designPaw2.png')}
-              style={styles.paw4Image}
-              resizeMode="contain"
-            />
-
       {gamePaused && (
         <View style={styles.overlay}>
           <View style={styles.centeredBox}>
@@ -242,7 +259,6 @@ const Minigame = () => {
           </View>
         </View>
       )}
-
       {countdown !== null && (
         <View style={styles.countdownOverlay}>
           <Text style={styles.countdownText}>{countdown}</Text>
@@ -253,18 +269,7 @@ const Minigame = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#D0DFF4',
-  },
-  heart: {
-    width: dimensions.screenWidth * 0.,
-    height: dimensions.screenHeight * 0.06,
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    resizeMode: 'contain',
-  },
+  container: { flex: 1, backgroundColor: '#D0DFF4' },
   scoreText: {
     fontSize: 36,
     fontWeight: 'bold',
@@ -293,10 +298,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: dimensions.screenWidth * 0.02,
   },
-  cat: {
-    width: '100%',
-    height: '100%',
-  },
+  cat: { width: '100%', height: '100%' },
   fish: {
     width: dimensions.screenWidth * 0.15,
     height: dimensions.screenHeight * 0.05,
@@ -314,10 +316,7 @@ const styles = StyleSheet.create({
     width: '70%',
     alignItems: 'center',
   },
-  logo: {
-    width: 80,
-    height: 80,
-  },
+  logo: { width: 80, height: 80 },
   congratsText: {
     fontSize: dimensions.screenWidth * 0.04,
     marginTop: dimensions.screenWidth * 0.03,
@@ -343,53 +342,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  restartBox: {
-    backgroundColor: '#DA8474',
-  },
+  restartBox: { backgroundColor: '#DA8474' },
   smallBoxText: {
     fontSize: dimensions.screenWidth * 0.03,
     color: '#fff',
   },
   countdownOverlay: {
     ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   countdownText: {
-    fontSize: 80,
+    fontSize: dimensions.screenWidth * 0.1,
     fontWeight: 'bold',
-    color: 'white',
+    color: '#fff',
   },
-  paw1Image: {
-    position: 'absolute',
-    bottom: -10,
-    left: -10,
-    width: 80,
-    height: 80,
-  },
-  paw2Image: {
-    position: 'absolute',
-    top: 0,
-    right: -30,
-    width: 200,
-    height: 200,
-  },
-  paw3Image: {
-    position: 'absolute',
-    bottom: 300,
-    left: 10,
-    width: 100,
-    height: 200,
-  },
-  paw4Image: {
-    position: 'absolute',
-    top: 530,
-    right: -30,
-    width: 150,
-    height: 150,
-  },
-
+  paw1Image: { position: 'absolute', bottom: -10, left: -10, width: 80, height: 80 },
+  paw2Image: { position: 'absolute', top: 0, right: -30, width: 200, height: 200 },
+  paw3Image: { position: 'absolute', bottom: 300, left: 10, width: 100, height: 200 },
+  paw4Image: { position: 'absolute', top: 530, right: -30, width: 150, height: 150 },
 });
 
 export default Minigame;
