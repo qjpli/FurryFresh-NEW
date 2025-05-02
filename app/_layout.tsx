@@ -322,6 +322,10 @@ const RootLayout = () => {
                 name="screens/playdate/chats/message_screen"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="screens/reviews/reviews"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </PortalProvider>
         </GestureHandlerRootView>

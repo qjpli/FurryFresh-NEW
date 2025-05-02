@@ -1,48 +1,46 @@
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  Animated, 
-  Easing, 
-  TextInput, 
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+  Easing,
+  TextInput,
   StyleSheet,
-  Image,
-  FlatList
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import MainContPlain from '../../components/general/background_plain';
 import dimensions from '../../utils/sizing';
-import { router, useLocalSearchParams } from 'expo-router';
-import moment from 'moment';
-import Spacer from '../../components/general/spacer';
-import { usePet } from '../../context/pet_context';
-import { useGrooming } from '../../context/grooming_context';
-import SvgValue from '../../hooks/fetchSvg';
-import TitleValue from '../../components/list/title_value';
 import Button1 from '../../components/buttons/button1';
 
 interface ReviewComponentProps {
   onSubmit?: (rating: number, comment: string) => void;
 }
 
+// Enable LayoutAnimation on Android
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
 const ReviewComponent: React.FC<ReviewComponentProps> = ({ onSubmit }) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [showComment, setShowComment] = useState(false);
-  const starPosition = new Animated.Value(0);
+  const starPosition = useState(new Animated.Value(0))[0];
 
   const handleStarPress = (selectedRating: number) => {
     setRating(selectedRating);
-    
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setShowComment(true);
+
     Animated.timing(starPosition, {
       toValue: 1,
       duration: 300,
       easing: Easing.out(Easing.quad),
       useNativeDriver: true,
-    }).start(() => {
-      setShowComment(true);
-    });
+    }).start();
   };
 
   const starTranslateY = starPosition.interpolate({
@@ -51,60 +49,62 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({ onSubmit }) => {
   });
 
   return (
-    <View style={reviewStyles.container}>
-      <Animated.View style={[reviewStyles.starsContainer, { transform: [{ translateY: starTranslateY }] }]}>
-        <Text style={reviewStyles.promptText}>How was your experience?</Text>
-        <View style={reviewStyles.starsRow}>
-          {[1, 2, 3, 4, 5].map((star) => (
-            <TouchableOpacity 
-              key={`star-${star}`}
-              onPress={() => handleStarPress(star)}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name={star <= rating ? 'star' : 'star-outline'}
-                size={40}
-                color={star <= rating ? '#FFD700' : '#CCCCCC'}
-              />
-            </TouchableOpacity>
-          ))}
-        </View>
-      </Animated.View>
-
-      {showComment && (
-        <Animated.View 
-          style={[
-            reviewStyles.commentContainer,
-            {
-              opacity: starPosition,
-              transform: [
-                {
-                  translateY: starPosition.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [20, 0],
-                  }),
-                },
-              ],
-            },
-          ]}
-        >
-          <Text style={reviewStyles.commentPrompt}>Tell us more about your experience</Text>
-          <TextInput
-            style={reviewStyles.commentInput}
-            multiline
-            numberOfLines={4}
-            placeholder="What did you like or dislike?"
-            value={comment}
-            onChangeText={setComment}
-          />
-          <Button1
-            title="Submit Review"
-            isPrimary={true}
-            borderRadius={15}
-            onPress={() => onSubmit?.(rating, comment)}
-          />
+    <View style={{ flex: 1, justifyContent: 'center' }}>
+      <View style={reviewStyles.container}>
+        <Animated.View style={[reviewStyles.starsContainer, { transform: [{ translateY: starTranslateY }] }]}>
+          <Text style={reviewStyles.promptText}>How was your experience?</Text>
+          <View style={reviewStyles.starsRow}>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <TouchableOpacity
+                key={`star-${star}`}
+                onPress={() => handleStarPress(star)}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name={star <= rating ? 'star' : 'star-outline'}
+                  size={40}
+                  color={star <= rating ? '#FFD700' : '#CCCCCC'}
+                />
+              </TouchableOpacity>
+            ))}
+          </View>
         </Animated.View>
-      )}
+
+        {showComment && (
+          <Animated.View
+            style={[
+              reviewStyles.commentContainer,
+              {
+                opacity: starPosition,
+                transform: [
+                  {
+                    translateY: starPosition.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [20, 0],
+                    }),
+                  },
+                ],
+              },
+            ]}
+          >
+            <Text style={reviewStyles.commentPrompt}>Tell us more about your experience</Text>
+            <TextInput
+              style={reviewStyles.commentInput}
+              multiline
+              numberOfLines={4}
+              placeholder="What did you like or dislike?"
+              value={comment}
+              onChangeText={setComment}
+            />
+            <Button1
+              title="Submit Review"
+              isPrimary={true}
+              borderRadius={15}
+              onPress={() => onSubmit?.(rating, comment)}
+            />
+          </Animated.View>
+        )} 
+      </View>
     </View>
   );
 };

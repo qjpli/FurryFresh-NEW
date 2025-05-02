@@ -33,9 +33,10 @@ const MessageScreen = () => {
     clearLastReceivedMessage,
   } = useMessages();
   const { typingStatuses, setTypingStatus } = useTyping();
-  const { conversationId, otherPetAvatar } = useLocalSearchParams<{
+  const { conversationId, otherPetAvatar, otherPetName } = useLocalSearchParams<{
     conversationId: string;
     otherPetAvatar: string;
+    otherPetName: string;
   }>();
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [messageInput, setMessageInput] = useState("");
@@ -246,22 +247,22 @@ const MessageScreen = () => {
               isMine ? styles.myMessageBubble : styles.senderMessageBubble,
               isMine ? styles.myBubble : styles.theirBubble,
               isStartOfBlock &&
-                !isMine && {
-                  borderTopLeftRadius: 18,
-                  borderTopRightRadius: 20,
-                },
+              !isMine && {
+                borderTopLeftRadius: 18,
+                borderTopRightRadius: 20,
+              },
               isLastOfBlock &&
-                !isMine && {
-                  borderBottomLeftRadius: 18,
-                  borderBottomRightRadius: 20,
-                },
+              !isMine && {
+                borderBottomLeftRadius: 18,
+                borderBottomRightRadius: 20,
+              },
               isStartOfBlock &&
-                isMine && { borderTopRightRadius: 18, borderTopLeftRadius: 20 },
+              isMine && { borderTopRightRadius: 18, borderTopLeftRadius: 20 },
               isLastOfBlock &&
-                isMine && {
-                  borderBottomRightRadius: 18,
-                  borderBottomLeftRadius: 20,
-                },
+              isMine && {
+                borderBottomRightRadius: 18,
+                borderBottomLeftRadius: 20,
+              },
             ]}
           >
             <Text
@@ -284,7 +285,7 @@ const MessageScreen = () => {
             </View>
           ) : null}
 
-          {isMine && item.read_at && shouldShowSent && ( 
+          {isMine && item.read_at && shouldShowSent && (
             <View style={{ marginRight: dimensions.screenWidth * 0.01 }}>
               {!isPending && (
                 <Text style={styles.sendingText}>
@@ -301,10 +302,11 @@ const MessageScreen = () => {
   return (
     <View style={styles.container}>
       <AppbarDefault
+        titleSize={dimensions.screenWidth * 0.045}
+        title={otherPetName}
         session={session}
-        titleSize={0}
+        showLeading={false}
         leadingChildren={null}
-        showLeading={true}
       />
       <KeyboardAvoidingView
         style={styles.keyboard}

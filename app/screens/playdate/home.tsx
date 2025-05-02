@@ -284,8 +284,8 @@ const Home = () => {
       console.log('nullll')
 
       setTimeout(function () {
-        openSheet();
-      }, 500);
+        openSheet(); 
+      }, 2000);
     }
   }, []);
 
