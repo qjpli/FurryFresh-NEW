@@ -41,15 +41,17 @@ const Profile = () => {
   // Add this effect to refresh bio when screen focuses
   useFocusEffect(
     useCallback(() => {
-      const fetchAvatar = async () => {
+      const fetchUserData = async () => {
         const { data, error } = await supabase.auth.getUser();
         if (!error && data.user) {
           setAvatarUrl(data.user.user_metadata?.avatar_url || null);
+          setBio(data.user.user_metadata?.bio || "");
         }
       };
-      fetchAvatar();
+      fetchUserData();
     }, [])
   );
+  
 
 
   const sheetRef = useRef<BottomSheet>(null);

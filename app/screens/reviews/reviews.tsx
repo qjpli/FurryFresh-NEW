@@ -10,13 +10,19 @@ import {
   LayoutAnimation,
   Platform,
   UIManager,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import dimensions from '../../utils/sizing';
 import Button1 from '../../components/buttons/button1';
+import supabase from '../../utils/supabase';
+import { useSession } from '../../context/sessions_context';
 
 interface ReviewComponentProps {
-  onSubmit?: (rating: number, comment: string) => void;
+  refId: number;
+  serviceProductId: number;
+  type: string;
+  onSuccess?: () => void;
 }
 
 // Enable LayoutAnimation on Android
@@ -24,11 +30,20 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const ReviewComponent: React.FC<ReviewComponentProps> = ({ onSubmit }) => {
+const ReviewComponent: React.FC<ReviewComponentProps> = ({
+  refId,
+  serviceProductId,
+  type,
+  onSuccess,
+}) => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [showComment, setShowComment] = useState(false);
+  const [loading, setLoading] = useState(false);
   const starPosition = useState(new Animated.Value(0))[0];
+
+  const { session } = useSession();
+  const userId = session?.user?.id;
 
   const handleStarPress = (selectedRating: number) => {
     setRating(selectedRating);
@@ -43,6 +58,52 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({ onSubmit }) => {
     }).start();
   };
 
+  const handleSubmit = async () => {
+    console.log('Submitting review to Supabase...');
+    console.log('User ID:', userId);
+    console.log('Ref ID:', refId);
+    console.log('Service Product ID:', serviceProductId);
+    console.log('Type:', type);
+    console.log('Rating:', rating);
+    console.log('Comment:', comment);
+    
+    if (!rating || !comment.trim()) {
+      Alert.alert('Incomplete Review', 'Please provide both a rating and comment.');
+      return;
+    }
+  
+    if (!userId || !refId || !serviceProductId || !type) {
+      Alert.alert('Missing review data.', 'Please ensure all required fields are filled out.');
+      return;
+    }
+  
+    setLoading(true);
+  
+    const { data, error } = await supabase.from('review_ratings').insert([
+      {
+        user_id: userId,
+        ref_id: refId,
+        service_product_id: serviceProductId,
+        type: type,
+        rating: rating,
+        review_text: comment,
+      },
+    ]);
+  
+    setLoading(false);
+  
+    if (error) {
+      console.error('Supabase error:', error);
+      Alert.alert('Review submission failed', error.message);
+    } else {
+      Alert.alert('Success', 'Thank you for your review!');
+      setComment('');
+      setRating(0);
+      setShowComment(false);
+      onSuccess?.();
+    }
+  };
+
   const starTranslateY = starPosition.interpolate({
     inputRange: [0, 1],
     outputRange: [0, -20],
@@ -51,7 +112,12 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({ onSubmit }) => {
   return (
     <View style={{ flex: 1, justifyContent: 'center' }}>
       <View style={reviewStyles.container}>
-        <Animated.View style={[reviewStyles.starsContainer, { transform: [{ translateY: starTranslateY }] }]}>
+        <Animated.View
+          style={[
+            reviewStyles.starsContainer,
+            { transform: [{ translateY: starTranslateY }] },
+          ]}
+        >
           <Text style={reviewStyles.promptText}>How was your experience?</Text>
           <View style={reviewStyles.starsRow}>
             {[1, 2, 3, 4, 5].map((star) => (
@@ -97,13 +163,15 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({ onSubmit }) => {
               onChangeText={setComment}
             />
             <Button1
-              title="Submit Review"
+              title={loading ? 'Submitting...' : 'Submit Review'}
               isPrimary={true}
               borderRadius={15}
-              onPress={() => onSubmit?.(rating, comment)}
+              onPress={() => {
+                if (!loading) handleSubmit();
+              }}
             />
           </Animated.View>
-        )} 
+        )}
       </View>
     </View>
   );
