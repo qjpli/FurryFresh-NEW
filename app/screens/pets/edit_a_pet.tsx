@@ -10,7 +10,8 @@ import {
     Platform,
     KeyboardAvoidingView,
     Keyboard,
-    TouchableWithoutFeedback
+    TouchableWithoutFeedback,
+    Switch
 } from "react-native";
 import { petsStyles } from "./components/petsStyles";
 import { Ionicons } from "@expo/vector-icons";
@@ -59,6 +60,11 @@ const EditPet = ({ back, pet }: EditPetProps) => {
     const [activePetGender, setActivePetGender] = useState(pet.gender.toLowerCase());
     const [image, setImage] = useState<string | null>(pet.pet_avatar || null);
     const [date, setDate] = useState(new Date());
+
+    const [petPlaydate, setPetPlaydate] = useState(pet.is_playdate_allowed);
+
+    const toggleSwitch = () => setPetPlaydate((previousState: any) => !previousState);
+
 
     const pickImage = async () => {
         const result = await ImagePicker.launchImageLibraryAsync({
@@ -114,6 +120,7 @@ const EditPet = ({ back, pet }: EditPetProps) => {
                 birthday: petBirthday || null,
                 bio: petBio,
                 breed: petBreed,
+                is_playdate_allowed: petPlaydate,
                 weight: parseFloat(petWeight) || null,
             };
 
@@ -353,6 +360,20 @@ const EditPet = ({ back, pet }: EditPetProps) => {
                             multiline={true}
                             numberOfLines={4}
                         />
+                    </View>
+
+                    {/* Pet Playdate */}
+                    <View style={styles.formGroup}>
+                        <Text style={petsStyles.formLabel}>Pet's Playdate (Optional)</Text>
+                        <View style={{ alignItems: 'flex-start' }}>
+                            <Switch
+                                trackColor={{ false: '#767577', true: '#466AA2' }}
+                                thumbColor={petPlaydate ? '#ffffff' : '#f4f3f4'}
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={toggleSwitch}
+                                value={petPlaydate}
+                            />
+                        </View>
                     </View>
                     <Spacer height={dimensions.screenHeight * 0.15} />
                 </MainContPaw>
