@@ -1,9 +1,9 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import MainContPlain from '../../components/general/background_plain'
 import { Ionicons } from '@expo/vector-icons'
 import dimensions from '../../utils/sizing'
-import { router, useLocalSearchParams } from 'expo-router'
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router'
 import Booking from '../../interfaces/booking'
 import moment from 'moment'
 import Spacer from '../../components/general/spacer'
@@ -13,16 +13,50 @@ import { useGrooming } from '../../context/grooming_context'
 import SvgValue from '../../hooks/fetchSvg'
 import TitleValue from '../../components/list/title_value'
 import Button1 from '../../components/buttons/button1'
+import supabase from '../../utils/supabase'
 
 
 const PreviewGrooming = () => {
+  const [toReview, setToReview] = useState(false);
+
   const { booking } = useLocalSearchParams();
   const { pets } = usePet();
   const { groomings } = useGrooming();
 
   const parsedBooking = booking ? JSON.parse(booking as string) as Booking : null;
 
+
+
   const grooming = groomings.find((groom) => groom.subcategory_id == parsedBooking?.grooming_id);
+
+  const checkReview = async () => {
+    const { count, error } = await supabase
+      .from('review_ratings')
+      .select('*', { count: 'exact' })
+      .eq('ref_id', parsedBooking?.id);
+
+
+    const val = count ?? 0;
+
+    if (val > 0) {
+      console.log('Review existing');
+    } else {
+      setToReview(true);
+      console.log('No review found');
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      console.log('Triggered on return');
+      // Your function call here
+      checkReview();
+
+      return () => {
+        console.log('Leaving the screen');
+      };
+    }, [])
+  );
 
   return (
     <View style={{ flex: 1, height: '100%', position: 'relative', width: '100%' }}>
@@ -188,13 +222,20 @@ const PreviewGrooming = () => {
         <Ionicons name='ellipsis-horizontal' size={dimensions.screenWidth * 0.05} color="#fff" />
       </View>
       {
-        parsedBooking?.status == 'completed' && (
+        parsedBooking?.status == 'completed' && toReview && (
           <View style={{ position: 'absolute', bottom: dimensions.screenHeight * 0.03, width: '100%', paddingHorizontal: dimensions.screenWidth * 0.06 }}>
             <Button1
               title='Add a Review'
               isPrimary={false}
               borderRadius={15}
-              onPress={() => router.push('../reviews/reviews')}
+              onPress={() => router.push({
+                pathname: '../reviews/reviews',
+                params: {
+                  refId: parsedBooking?.id,
+                  serviceProductId: grooming?.subcategory_id,
+                  type: 'PetCare'
+                }
+              })}
             />
           </View>
         )

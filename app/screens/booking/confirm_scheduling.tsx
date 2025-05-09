@@ -160,7 +160,7 @@ const ConfirmScheduling = () => {
         }
       }
 
-      router.replace({
+      router.replace({ 
         pathname: './success_booking',
         params: {
           booking: JSON.stringify(bookingResult),

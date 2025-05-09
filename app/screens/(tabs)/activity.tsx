@@ -118,7 +118,7 @@ const Activity = () => {
                   <BookingItem item={item} />
                 </TouchableOpacity>;
               } else {
-                return <TouchableOpacity key={item.id} onPress={() => router.push('../activity/preview_grooming')}>
+                return <TouchableOpacity key={item.id} onPress={() => {}}>
                   <OrderItem item={item} />
                 </TouchableOpacity>;
               }

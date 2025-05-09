@@ -106,7 +106,7 @@ export default () => {
               
                 </View>
               ),
-              tabBarBadge: 10,
+              // tabBarBadge: 10,
               headerShown: false
             }}
           />

@@ -17,6 +17,8 @@ import dimensions from '../../utils/sizing';
 import Button1 from '../../components/buttons/button1';
 import supabase from '../../utils/supabase';
 import { useSession } from '../../context/sessions_context';
+import ReviewIcon from '../../components/svgs/reviews/ReviewIcon';
+import { router, useLocalSearchParams } from 'expo-router';
 
 interface ReviewComponentProps {
   refId: number;
@@ -25,17 +27,12 @@ interface ReviewComponentProps {
   onSuccess?: () => void;
 }
 
-// Enable LayoutAnimation on Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-const ReviewComponent: React.FC<ReviewComponentProps> = ({
-  refId,
-  serviceProductId,
-  type,
-  onSuccess,
-}) => {
+const ReviewComponent = () => {
+  const { refId, serviceProductId, type } = useLocalSearchParams();
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [showComment, setShowComment] = useState(false);
@@ -44,6 +41,14 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({
 
   const { session } = useSession();
   const userId = session?.user?.id;
+
+  const ratingTexts = [
+    'Very disappointing experience.',
+    'Needs significant improvement.',
+    'Average, but could be better.',
+    'Good, but with some room for improvement.',
+    'Excellent service, highly satisfied!'
+  ];
 
   const handleStarPress = (selectedRating: number) => {
     setRating(selectedRating);
@@ -59,48 +64,38 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({
   };
 
   const handleSubmit = async () => {
-    console.log('Submitting review to Supabase...');
-    console.log('User ID:', userId);
-    console.log('Ref ID:', refId);
-    console.log('Service Product ID:', serviceProductId);
-    console.log('Type:', type);
-    console.log('Rating:', rating);
-    console.log('Comment:', comment);
-    
     if (!rating || !comment.trim()) {
       Alert.alert('Incomplete Review', 'Please provide both a rating and comment.');
       return;
     }
-  
+
     if (!userId || !refId || !serviceProductId || !type) {
-      Alert.alert('Missing review data.', 'Please ensure all required fields are filled out.');
+      console.log('User ID: ', userId);
+      console.log('Ref ID: ', refId);
+      console.log('Service Product ID: ', serviceProductId);
+      console.log('Ty[e]: ', type);
       return;
     }
-  
+
     setLoading(true);
-  
-    const { data, error } = await supabase.from('review_ratings').insert([
+
+    const { error } = await supabase.from('review_ratings').insert([
       {
         user_id: userId,
-        ref_id: refId,
+        ref_id: refId, 
         service_product_id: serviceProductId,
         type: type,
         rating: rating,
         review_text: comment,
       },
     ]);
-  
+
     setLoading(false);
-  
+
     if (error) {
-      console.error('Supabase error:', error);
       Alert.alert('Review submission failed', error.message);
     } else {
-      Alert.alert('Success', 'Thank you for your review!');
-      setComment('');
-      setRating(0);
-      setShowComment(false);
-      onSuccess?.();
+      router.back();
     }
   };
 
@@ -110,7 +105,7 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({
   });
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center' }}>
+    <View style={{ flex: 1, justifyContent: 'center', backgroundColor: '#fff' }}>
       <View style={reviewStyles.container}>
         <Animated.View
           style={[
@@ -118,7 +113,13 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({
             { transform: [{ translateY: starTranslateY }] },
           ]}
         >
-          <Text style={reviewStyles.promptText}>How was your experience?</Text>
+          <ReviewIcon width={dimensions.screenWidth * 0.2} height={dimensions.screenWidth * 0.2} style={{ alignSelf: 'center', marginBottom: 20 }} />
+          <Text style={reviewStyles.promptText}>
+            {showComment ? 'How was your experience?' : ratingTexts[rating - 1] || 'How was your experience?'}
+          </Text>
+          <Text style={reviewStyles.promptSubtitle}>
+            {showComment ? ratingTexts[rating - 1] || 'Rate your experience with the service' : 'How was your experience?'}
+          </Text>
           <View style={reviewStyles.starsRow}>
             {[1, 2, 3, 4, 5].map((star) => (
               <TouchableOpacity
@@ -129,7 +130,7 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({
                 <Ionicons
                   name={star <= rating ? 'star' : 'star-outline'}
                   size={40}
-                  color={star <= rating ? '#FFD700' : '#CCCCCC'}
+                  color={star <= rating ? 'orange' : '#CCCCCC'}
                 />
               </TouchableOpacity>
             ))}
@@ -158,13 +159,13 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({
               style={reviewStyles.commentInput}
               multiline
               numberOfLines={4}
-              placeholder="What did you like or dislike?"
+              placeholder=""
               value={comment}
               onChangeText={setComment}
             />
             <Button1
               title={loading ? 'Submitting...' : 'Submit Review'}
-              isPrimary={true}
+              isPrimary={false}
               borderRadius={15}
               onPress={() => {
                 if (!loading) handleSubmit();
@@ -179,6 +180,7 @@ const ReviewComponent: React.FC<ReviewComponentProps> = ({
 
 export default ReviewComponent;
 
+
 const reviewStyles = StyleSheet.create({
   container: {
     padding: 20,
@@ -186,20 +188,21 @@ const reviewStyles = StyleSheet.create({
     borderRadius: 15,
     marginHorizontal: dimensions.screenWidth * 0.06,
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
   },
   starsContainer: {
     alignItems: 'center',
     paddingVertical: 20,
   },
   promptText: {
-    fontFamily: 'Poppins-SemiBold',
-    fontSize: dimensions.screenWidth * 0.045,
+    fontFamily: 'Poppins-Bold',
+    fontSize: dimensions.screenWidth * 0.055,
     color: '#466AA2',
+  },
+  promptSubtitle: {
+    fontFamily: 'Poppins-Regular',
+    textAlign: 'center',
+    fontSize: dimensions.screenWidth * 0.03,
+    color: '#808080',
     marginBottom: 15,
   },
   starsRow: {
@@ -214,7 +217,7 @@ const reviewStyles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     fontSize: dimensions.screenWidth * 0.035,
     color: '#808080',
-    marginBottom: 10,
+    marginBottom: 5,
   },
   commentInput: {
     borderWidth: 1,
