@@ -10,6 +10,7 @@ import supabase from '../../utils/supabase';
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import moment from 'moment';
 import CustomInputEvent from "../../components/inputs/custom_input_event";
+import Spacer from '../../components/general/spacer';
 
 const EditProfile = () => {
     const { session } = useSession();
@@ -79,7 +80,7 @@ const EditProfile = () => {
             const { data: data, error: profileError } = await supabase
                 .auth
                 .updateUser({
-                  data: profileData
+                    data: profileData
                 });
 
             if (profileError) throw profileError;
@@ -192,12 +193,12 @@ const EditProfile = () => {
                             }}
                         />
                     </View>
-
-                    <TouchableOpacity style={styles.button} onPress={handleSave} disabled={loading}>
-                        <Text style={styles.buttonText}>{loading ? 'Saving...' : 'Save Changes'}</Text>
-                    </TouchableOpacity>
+                    <Spacer height={dimensions.screenHeight * 0.1} />
                 </ScrollView>
             </MainContPaw>
+            <TouchableOpacity style={styles.button} onPress={handleSave} disabled={loading}>
+                <Text style={styles.buttonText}>{loading ? 'Saving...' : 'Save Changes'}</Text>
+            </TouchableOpacity>
 
             {Platform.OS === 'ios' && showPicker && (
                 <View style={styles.iosDatePickerContainer}>
@@ -225,9 +226,13 @@ const styles = StyleSheet.create({
         gap: dimensions.screenHeight * 0.02,
     },
     button: {
-        backgroundColor: '#4B9CD3',
+        backgroundColor: '#466AA2',
         paddingVertical: 14,
         borderRadius: 10,
+        position: 'absolute',
+        left: dimensions.screenWidth * 0.07,
+        right: dimensions.screenWidth * 0.07,
+        bottom: dimensions.screenHeight * 0.05,
         alignItems: 'center',
         marginTop: 10,
     },
