@@ -325,6 +325,10 @@ const RootLayout = () => {
                 name="screens/reviews/reviews"
                 options={{ headerShown: false }}
               />
+              <Stack.Screen
+                name="screens/reviews/petcare_review"
+                options={{ headerShown: false }}
+              />
             </Stack>
           </PortalProvider>
         </GestureHandlerRootView>

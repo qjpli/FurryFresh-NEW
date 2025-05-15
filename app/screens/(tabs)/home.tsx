@@ -218,7 +218,7 @@ const Home = () => {
 
                               const { data, error } = await supabase
                                 .from('review_ratings')
-                                .select('rating')
+                                .select('*')
                                 .eq('service_product_id', subcatItem.id);
 
                               setFetchingReview(false);
@@ -459,13 +459,25 @@ const Home = () => {
               </View>
               <View style={styles.bottomPartView}>
                 {
-                  !fetchingReview && <View
+                  !fetchingReview && <TouchableOpacity
                     style={{
                       marginBottom: dimensions.screenHeight * 0.02,
                       display: "flex",
                       justifyContent: "space-between",
                       flexDirection: "row",
                       gap: 30,
+                    }}
+                    onPress={() => {
+                      if((reviewData ?? []).length == 0) return;
+
+                      router.push({
+                        pathname: '../reviews/petcare_review',
+                        params: {
+                          reviews: JSON.stringify(reviewData),
+                          ratings: JSON.stringify(averageRating),
+                          subcategory: JSON.stringify(selectedGrooming)
+                        }
+                      })
                     }}
                   >
                     <View
@@ -574,7 +586,7 @@ const Home = () => {
                         </Text>
                       </View>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                 }
                 <Button1
                   isPrimary={false}

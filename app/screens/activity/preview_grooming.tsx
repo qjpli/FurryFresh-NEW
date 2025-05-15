@@ -34,6 +34,7 @@ const PreviewGrooming = () => {
   const grooming = groomings.find((groom) => groom.subcategory_id == parsedBooking?.grooming_id);
 
   const checkReview = async () => {
+
     const { data, error } = await supabase
       .from('review_ratings')
       .select('*')
@@ -41,8 +42,7 @@ const PreviewGrooming = () => {
       .select();
 
 
-    if (data) {
-      console.log('Review existing');
+    if (data != null && data.length > 0) {
       setReviewData(data[0]);
     } else {
       setToReview(true);
@@ -217,9 +217,9 @@ const PreviewGrooming = () => {
                     }}>
                       <Text style={{ fontFamily: 'Poppins-Regular', fontSize: dimensions.screenSize * 0.011, color: '#000' }}>{reviewData.review_text}</Text>
                       <View style={{
-                          alignItems: 'flex-center',
                           flexDirection: 'row',
-                          justifyContent: 'flex-end'
+                          justifyContent: 'flex-end',
+                          alignItems: 'center'
                         }}>
                           <Ionicons size={dimensions.screenSize * 0.013} name='star' color="orange" />
                           <Spacer width={dimensions.screenWidth * 0.01} />
@@ -299,7 +299,7 @@ const PreviewGrooming = () => {
         )
       }
       {
-        parsedBooking?.status == 'completed' && toReview && (
+        parsedBooking?.status == 'completed' && toReview && reviewData == null &&  (
           <View style={{ position: 'absolute', bottom: dimensions.screenHeight * 0.03, width: '100%', paddingHorizontal: dimensions.screenWidth * 0.06 }}>
             <Button1
               title='Add a Review'

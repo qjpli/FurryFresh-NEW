@@ -96,6 +96,7 @@ const ReviewComponent = () => {
       Alert.alert('Review submission failed', error.message);
     } else {
       router.back();
+      Alert.prompt('Review submitted!');
     }
   };
 
