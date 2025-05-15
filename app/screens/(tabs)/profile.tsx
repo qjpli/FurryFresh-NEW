@@ -35,6 +35,7 @@ const Profile = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isLoading, setLoading] = useState(false);
   const [bio, setBio] = useState(session?.user.user_metadata?.bio || "");
+  const [playdates, setPlaydates] = useState<number | null>();
   const bioInputRef = useRef<TextInput>(null);
 
 
@@ -42,16 +43,30 @@ const Profile = () => {
   useFocusEffect(
     useCallback(() => {
       const fetchUserData = async () => {
-        const { data, error } = await supabase.auth.getUser();
-        if (!error && data.user) {
+        if (session?.user == null) return;
+
+        const { data, error: authError } = await supabase.auth.getUser();
+        if (!authError && data.user) {
           setAvatarUrl(data.user.user_metadata?.avatar_url || null);
           setBio(data.user.user_metadata?.bio || "");
         }
+
+        const { count, error: matchError } = await supabase
+          .from('playdate_matches')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', session?.user.id);
+
+        if (matchError) {
+          console.error('Error counting matches:', matchError);
+        } else {
+          setPlaydates(count);
+          console.log('Total count:', count);
+        }
       };
+
       fetchUserData();
     }, [])
   );
-  
 
 
   const sheetRef = useRef<BottomSheet>(null);
@@ -247,7 +262,7 @@ const Profile = () => {
                 </View>
                 <View style={[styles.statItem, { flex: 1, alignItems: 'flex-end' }]}>
                   <View style={{ alignItems: 'center' }}>
-                    <Text style={styles.statNumber}>10</Text>
+                    <Text style={styles.statNumber}>{playdates ?? 0}</Text>
                     <Text style={styles.statLabel}>Playdates</Text>
                   </View>
                 </View>

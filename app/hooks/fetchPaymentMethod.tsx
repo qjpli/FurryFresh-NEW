@@ -7,13 +7,13 @@ type PaymentMethod = {
 };
 
 const paymentMethodsPetCare: PaymentMethod[] = [
-    {
-        id: 'Pay-on-service',
-        icon: 'pay-on-service',
-        name: 'Pay on Service',
-        isAllowed: true,
-        isAvailable: true,
-    },
+    // {
+    //     id: 'Pay-on-service',
+    //     icon: 'pay-on-service',
+    //     name: 'Pay on Service',
+    //     isAllowed: true,
+    //     isAvailable: true,
+    // },
     {
         id: 'PayPal',
         icon: 'paypal',

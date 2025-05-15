@@ -14,6 +14,7 @@ import SvgValue from '../../hooks/fetchSvg'
 import TitleValue from '../../components/list/title_value'
 import Button1 from '../../components/buttons/button1'
 import supabase from '../../utils/supabase'
+import { useBooking } from '../../context/booking_context'
 
 
 const PreviewGrooming = () => {
@@ -22,24 +23,27 @@ const PreviewGrooming = () => {
   const { booking } = useLocalSearchParams();
   const { pets } = usePet();
   const { groomings } = useGrooming();
+  const [isLoading1, setLoading1] = useState<boolean>(false);
+  const { updateBookingContext, bookings } = useBooking();
+  const [reviewData, setReviewData] = useState<any>(null);
 
-  const parsedBooking = booking ? JSON.parse(booking as string) as Booking : null;
-
+  const bookingRaw = booking ? JSON.parse(booking as string) as Booking : null;
+  const parsedBooking = bookings.find((book) => book.id == bookingRaw?.id);
 
 
   const grooming = groomings.find((groom) => groom.subcategory_id == parsedBooking?.grooming_id);
 
   const checkReview = async () => {
-    const { count, error } = await supabase
+    const { data, error } = await supabase
       .from('review_ratings')
-      .select('*', { count: 'exact' })
-      .eq('ref_id', parsedBooking?.id);
+      .select('*')
+      .eq('ref_id', parsedBooking?.id)
+      .select();
 
 
-    const val = count ?? 0;
-
-    if (val > 0) {
+    if (data) {
       console.log('Review existing');
+      setReviewData(data[0]);
     } else {
       setToReview(true);
       console.log('No review found');
@@ -49,7 +53,6 @@ const PreviewGrooming = () => {
   useFocusEffect(
     useCallback(() => {
       console.log('Triggered on return');
-      // Your function call here
       checkReview();
 
       return () => {
@@ -63,7 +66,6 @@ const PreviewGrooming = () => {
       <MainContPlain scrollEnabled={true}>
         <View style={general.header}>
         </View>
-        {/* <Text style={{  backgroundColor: 'green' }}>PreviewGrooming</Text> */}
         <View style={body.main}>
           <View style={body.cont}>
             <View style={body.titleCont}>
@@ -194,6 +196,42 @@ const PreviewGrooming = () => {
                   />
                 </View>
               </View>
+              <Spacer height={dimensions.screenHeight * 0.02} />
+              {
+                reviewData && <View>
+                  <View style={{ display: 'flex', flexDirection: 'row' }}>
+                    <Ionicons name='star' size={dimensions.screenWidth * 0.04} color="#808080" />
+                    <Spacer width={dimensions.screenWidth * 0.02} />
+                    <Text style={body.otherDetailsTitle}>Review for this booking</Text>
+                  </View>
+                  <View style={{
+                    paddingHorizontal: dimensions.screenWidth * 0.04,
+                    paddingVertical: dimensions.screenHeight * 0.01,
+                    borderRadius: 13
+                  }}>
+                    <Text style={{ fontFamily: 'Poppins-Medium', fontSize: dimensions.screenSize * 0.01, color: '#808080', marginLeft: dimensions.screenWidth * 0.01 }}>You said:</Text>
+                    <View style={{
+                      backgroundColor: '#E7E7E7',
+                      padding: dimensions.screenSize * 0.01,
+                      borderRadius: 15
+                    }}>
+                      <Text style={{ fontFamily: 'Poppins-Regular', fontSize: dimensions.screenSize * 0.011, color: '#000' }}>{reviewData.review_text}</Text>
+                      <View style={{
+                          alignItems: 'flex-center',
+                          flexDirection: 'row',
+                          justifyContent: 'flex-end'
+                        }}>
+                          <Ionicons size={dimensions.screenSize * 0.013} name='star' color="orange" />
+                          <Spacer width={dimensions.screenWidth * 0.01} />
+                          <Text style={{  
+                            fontFamily: 'Poppins-Regular', fontSize: dimensions.screenSize * 0.01, color: '#000'
+                          }}>{(reviewData.rating).toFixed(1)} • Sent on {moment(reviewData.created_at).format("MMM DD, YYYY")}</Text>
+
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              }
             </View>
           </View>
           <Spacer height={dimensions.screenHeight * 0.2} />
@@ -203,7 +241,9 @@ const PreviewGrooming = () => {
         <View style={floating.main}>
           <View style={[floating.cont, {}]}>
             <Text style={floating.title}>Basic Grooming</Text>
-            <Text style={floating.status}>
+            <Text style={[floating.status, {
+              backgroundColor: parsedBooking?.status.toLocaleLowerCase() == 'completed' ? 'green' : '#ED7964'
+            }]}>
               {parsedBooking?.status.substring(0, 1).toLocaleUpperCase()}{parsedBooking?.status.substring(1, parsedBooking?.status.length)}
             </Text>
           </View>
@@ -221,6 +261,43 @@ const PreviewGrooming = () => {
         </TouchableOpacity>
         <Ionicons name='ellipsis-horizontal' size={dimensions.screenWidth * 0.05} color="#fff" />
       </View>
+      {
+        parsedBooking?.status != 'completed' && (
+          <View style={{ position: 'absolute', bottom: dimensions.screenHeight * 0.03, width: '100%', paddingHorizontal: dimensions.screenWidth * 0.06 }}>
+            <Button1
+              title='Mark as Completed'
+              isPrimary={true}
+              loading={isLoading1}
+              borderRadius={15}
+              onPress={async () => {
+                setLoading1(true);
+
+                const { data, error } = await supabase
+                  .from('bookings')
+                  .update({
+                    status: 'completed',
+                    updated_at: new Date()
+                  })
+                  .eq('id', parsedBooking?.id)
+                  .select();
+
+                setLoading1(false);
+
+                if (error) {
+                  console.error('Error Encountered:', error);
+                  alert('Failed to mark booking as completed.');
+                  return;
+                }
+
+                if (data && data[0]) {
+                  updateBookingContext(data[0]);
+                  alert('Booking marked as completed.');
+                }
+              }}
+            />
+          </View>
+        )
+      }
       {
         parsedBooking?.status == 'completed' && toReview && (
           <View style={{ position: 'absolute', bottom: dimensions.screenHeight * 0.03, width: '100%', paddingHorizontal: dimensions.screenWidth * 0.06 }}>

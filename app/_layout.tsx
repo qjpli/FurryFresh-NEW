@@ -51,7 +51,6 @@ const RootLayout = () => {
   }, []);
 
 
-  // App preparation logic
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
 

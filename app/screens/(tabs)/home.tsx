@@ -103,6 +103,18 @@ const Home = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [selectedGrooming, setSelectedGrooming] = useState<Subcategories>();
   const snapPoints = useMemo(() => ["95%"], []);
+  const [fetchingReview, setFetchingReview] = useState<boolean>(false);
+  const [reviewData, setReviewData] = useState<any>();
+
+  const averageRating =
+    reviewData && reviewData.length > 0
+      ? (
+        reviewData.reduce((sum: number, item: { rating: any; }) => sum + (item.rating || 0), 0) /
+        reviewData.length
+      ).toFixed(1)
+      : "0.0";
+
+
   const openSheet = () => sheetRef.current?.expand();
 
   const backDrop = useCallback(
@@ -122,19 +134,12 @@ const Home = () => {
   const { subcategories, loading: loadingSubcategories } = useSubcategory();
   const { groomings, loading: loadingGroomings } = useGrooming();
 
-  const basic = [
-    {
-      title: "Bath & Blow Dry",
-      svg: "",
-    },
-    {
-      title: "Hair Trimming",
-      svg: "",
-    },
-  ];
-
   const handleSheetChange = (index: number) => {
-    if (index === 0) {
+    if (index === -1) {
+      console.log('Closed');
+
+      setFetchingReview(true);
+
       sheetRef.current?.close();
     }
   };
@@ -195,7 +200,7 @@ const Home = () => {
 
                       return (
                         <TouchableOpacity
-                          onPress={() => {
+                          onPress={async () => {
                             if (catItem.category == "PetSupplies") {
                               router.push({
                                 pathname: "../shop/shop",
@@ -205,8 +210,28 @@ const Home = () => {
                                 },
                               });
                             } else {
+                              setFetchingReview(true);
+
                               setSelectedGrooming(subcatItem);
                               openSheet();
+
+
+                              const { data, error } = await supabase
+                                .from('review_ratings')
+                                .select('rating')
+                                .eq('service_product_id', subcatItem.id);
+
+                              setFetchingReview(false);
+
+                              if (error) {
+                                console.error('Error encountered while fetching reviews:', error);
+
+                                return;
+                              }
+
+                              console.log('Found Reviews:', data)
+
+                              setReviewData(data);
                             }
                           }}
                         >
@@ -433,122 +458,124 @@ const Home = () => {
                 </View>
               </View>
               <View style={styles.bottomPartView}>
-                <View
-                  style={{
-                    marginBottom: dimensions.screenHeight * 0.02,
-                    display: "flex",
-                    justifyContent: "space-between",
-                    flexDirection: "row",
-                    gap: 30,
-                  }}
-                >
-                  <View
+                {
+                  !fetchingReview && <View
                     style={{
-                      backgroundColor: "#e2e7f3",
-                      borderRadius: 10,
-                      paddingHorizontal: dimensions.screenWidth * 0.02,
-                      flex: 1,
-                      paddingVertical: dimensions.screenHeight * 0.01,
+                      marginBottom: dimensions.screenHeight * 0.02,
                       display: "flex",
+                      justifyContent: "space-between",
                       flexDirection: "row",
-                      alignItems: "center",
+                      gap: 30,
                     }}
                   >
                     <View
                       style={{
-                        backgroundColor: "#466AA2",
-                        borderRadius: 100,
-                        width: dimensions.screenWidth * 0.08,
-                        height: dimensions.screenWidth * 0.08,
-                        alignItems: "center",
+                        backgroundColor: "#e2e7f3",
+                        borderRadius: 10,
+                        paddingHorizontal: dimensions.screenWidth * 0.02,
+                        flex: 1,
+                        paddingVertical: dimensions.screenHeight * 0.01,
                         display: "flex",
-                        justifyContent: "center",
-                        marginRight: dimensions.screenWidth * 0.02,
+                        flexDirection: "row",
+                        alignItems: "center",
                       }}
                     >
-                      <Ionicons
-                        name="heart"
-                        size={dimensions.screenWidth * 0.05}
-                        color="white"
-                      />
-                    </View>
-                    <View style={{ display: "flex", flexDirection: "column" }}>
-                      <Text
+                      <View
                         style={{
-                          color: "#808080",
-                          fontFamily: "Poppins-Regular",
-                          fontSize: dimensions.screenWidth * 0.025,
-                          lineHeight: dimensions.screenWidth * 0.04,
+                          backgroundColor: "#466AA2",
+                          borderRadius: 100,
+                          width: dimensions.screenWidth * 0.08,
+                          height: dimensions.screenWidth * 0.08,
+                          alignItems: "center",
+                          display: "flex",
+                          justifyContent: "center",
+                          marginRight: dimensions.screenWidth * 0.02,
                         }}
                       >
-                        Package Ratings
-                      </Text>
-                      <Text
-                        style={{
-                          color: "#808080",
-                          fontFamily: "Poppins-SemiBold",
-                          fontSize: dimensions.screenWidth * 0.04,
-                          lineHeight: dimensions.screenWidth * 0.05,
-                        }}
-                      >
-                        4.5
-                      </Text>
+                        <Ionicons
+                          name="heart"
+                          size={dimensions.screenWidth * 0.05}
+                          color="white"
+                        />
+                      </View>
+                      <View style={{ display: "flex", flexDirection: "column" }}>
+                        <Text
+                          style={{
+                            color: "#808080",
+                            fontFamily: "Poppins-Regular",
+                            fontSize: dimensions.screenWidth * 0.025,
+                            lineHeight: dimensions.screenWidth * 0.04,
+                          }}
+                        >
+                          Package Ratings
+                        </Text>
+                        <Text
+                          style={{
+                            color: "#808080",
+                            fontFamily: "Poppins-SemiBold",
+                            fontSize: dimensions.screenWidth * 0.04,
+                            lineHeight: dimensions.screenWidth * 0.05,
+                          }}
+                        >
+                          {averageRating}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                  <View
-                    style={{
-                      backgroundColor: "#e2e7f3",
-                      borderRadius: 10,
-                      paddingHorizontal: dimensions.screenWidth * 0.02,
-                      flex: 1,
-                      paddingVertical: dimensions.screenHeight * 0.01,
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
                     <View
                       style={{
-                        backgroundColor: "#466AA2",
-                        borderRadius: 100,
-                        width: dimensions.screenWidth * 0.08,
-                        height: dimensions.screenWidth * 0.08,
-                        alignItems: "center",
+                        backgroundColor: "#e2e7f3",
+                        borderRadius: 10,
+                        paddingHorizontal: dimensions.screenWidth * 0.02,
+                        flex: 1,
+                        paddingVertical: dimensions.screenHeight * 0.01,
                         display: "flex",
-                        justifyContent: "center",
-                        marginRight: dimensions.screenWidth * 0.02,
+                        flexDirection: "row",
+                        alignItems: "center",
                       }}
                     >
-                      <Ionicons
-                        name="chatbox"
-                        size={dimensions.screenWidth * 0.05}
-                        color="white"
-                      />
-                    </View>
-                    <View style={{ display: "flex", flexDirection: "column" }}>
-                      <Text
+                      <View
                         style={{
-                          color: "#808080",
-                          fontFamily: "Poppins-Regular",
-                          fontSize: dimensions.screenWidth * 0.025,
-                          lineHeight: dimensions.screenWidth * 0.04,
+                          backgroundColor: "#466AA2",
+                          borderRadius: 100,
+                          width: dimensions.screenWidth * 0.08,
+                          height: dimensions.screenWidth * 0.08,
+                          alignItems: "center",
+                          display: "flex",
+                          justifyContent: "center",
+                          marginRight: dimensions.screenWidth * 0.02,
                         }}
                       >
-                        Package Comments
-                      </Text>
-                      <Text
-                        style={{
-                          color: "#808080",
-                          fontFamily: "Poppins-SemiBold",
-                          fontSize: dimensions.screenWidth * 0.04,
-                          lineHeight: dimensions.screenWidth * 0.05,
-                        }}
-                      >
-                        56
-                      </Text>
+                        <Ionicons
+                          name="chatbox"
+                          size={dimensions.screenWidth * 0.05}
+                          color="white"
+                        />
+                      </View>
+                      <View style={{ display: "flex", flexDirection: "column" }}>
+                        <Text
+                          style={{
+                            color: "#808080",
+                            fontFamily: "Poppins-Regular",
+                            fontSize: dimensions.screenWidth * 0.025,
+                            lineHeight: dimensions.screenWidth * 0.04,
+                          }}
+                        >
+                          Package Comments
+                        </Text>
+                        <Text
+                          style={{
+                            color: "#808080",
+                            fontFamily: "Poppins-SemiBold",
+                            fontSize: dimensions.screenWidth * 0.04,
+                            lineHeight: dimensions.screenWidth * 0.05,
+                          }}
+                        >
+                          {(reviewData ?? []).length}
+                        </Text>
+                      </View>
                     </View>
                   </View>
-                </View>
+                }
                 <Button1
                   isPrimary={false}
                   onPress={() => {
@@ -632,6 +659,7 @@ const styles = StyleSheet.create({
   titleBox: {
     marginTop: dimensions.screenHeight * 0.05,
     marginLeft: dimensions.screenWidth * 0.045,
+    alignItems: 'flex-start',
     display: "flex",
     flexDirection: "column",
     justifyContent: "flex-start",
