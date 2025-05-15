@@ -146,6 +146,7 @@ const Home = () => {
 
   return (
     <MainContPlain paddingHorizontal={0}>
+      {/* {<View style={{backgroundColor: 'red' }}><Text>Test</Text></View>} */}
       {homeOptions.header(session)}
       <View style={{ paddingHorizontal: dimensions.screenWidth * 0.02 }}>
         <TouchableOpacity onPress={() => router.push('../search/search')}>
@@ -735,8 +736,8 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: "#fff",
-    paddingTop: dimensions.screenHeight * 0.06,
     paddingBottom: dimensions.screenHeight * 0.014,
+    paddingTop: dimensions.screenHeight * 0.01,
     paddingHorizontal: 16,
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
@@ -816,7 +817,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#fff",
     paddingHorizontal: dimensions.screenWidth * 0.03,
-    paddingVertical: dimensions.screenHeight * 0.01,
+    paddingVertical: dimensions.screenHeight * 0.015,
     marginBottom: dimensions.screenHeight * 0.02,
     borderRadius: 12,
     alignItems: "center",

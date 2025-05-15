@@ -336,7 +336,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: dimensions.screenWidth * 0.03,
   },
   titlePage: {
-    marginTop: dimensions.screenHeight * 0.04,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -346,7 +345,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: "Poppins-SemiBold",
     textAlign: "center",
-    marginVertical: dimensions.screenHeight * 0.03,
+    marginVertical: dimensions.screenHeight * 0.02,
   },
   iconContainer: {
     flexDirection: "row",

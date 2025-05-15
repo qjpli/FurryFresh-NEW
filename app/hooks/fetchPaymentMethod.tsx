@@ -25,13 +25,13 @@ const paymentMethodsPetCare: PaymentMethod[] = [
 ];
 
 const paymentMethodsPetSupplies: PaymentMethod[] = [
-    {
-        id: 'Cash-on-delivery',
-        icon: 'pay-on-service',
-        name: 'Cash on delivery',
-        isAllowed: true,
-        isAvailable: true,
-    },
+    // {
+    //     id: 'Cash-on-delivery',
+    //     icon: 'pay-on-service',
+    //     name: 'Cash on delivery',
+    //     isAllowed: true,
+    //     isAvailable: true,
+    // },
     {
         id: 'PayPal',
         icon: 'paypal',

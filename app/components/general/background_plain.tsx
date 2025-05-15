@@ -15,7 +15,7 @@ interface MainContPlainProps {
     left?: number;
     right?: number;
   };
-  scrollEnabled?: boolean; // New prop
+  scrollEnabled?: boolean; 
   height?: string | null;
 }
 
@@ -87,7 +87,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F8FF',
-    paddingTop: dimensions.screenHeight * 0.01,
     position: 'relative',
   },
   petenjoy: {

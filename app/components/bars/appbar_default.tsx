@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import dimensions from '../../utils/sizing';
 import { useRouter } from 'expo-router';
 import { Session } from '@supabase/supabase-js';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const AppbarDefault = ({
   session,
@@ -15,7 +16,7 @@ const AppbarDefault = ({
   leadingChildren = null,
   titleSize = dimensions.screenWidth * 0.05,
   subtitleSize = dimensions.screenWidth * 0.035,
-  paddingTop = dimensions.screenHeight * 0.07,
+  paddingTop = dimensions.screenHeight * 0.02,
   paddingBottom = dimensions.screenHeight * 0.02,
   subtitleFont,
   zIndex = 1,
@@ -49,7 +50,7 @@ const AppbarDefault = ({
   };
 
   return (
-    <View
+    <SafeAreaView
       style={[
         styles.container,
         {
@@ -94,7 +95,7 @@ const AppbarDefault = ({
       </View>
 
       {children && <View style={styles.toolbar}>{children}</View>}
-    </View>
+    </SafeAreaView>
   );
 };
 

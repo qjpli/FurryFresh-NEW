@@ -1,4 +1,4 @@
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, ScrollView } from 'react-native';
 import dimensions from '../../utils/sizing';
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,6 +8,7 @@ interface MainContCircleProps {
   showPetImage?: boolean;
   paddingHorizontal?: number | null;
   paddingVertical?: number | null;
+  isScrolled?: boolean;
 }
 
 const MainContCircle: React.FC<MainContCircleProps> = ({
@@ -15,7 +16,10 @@ const MainContCircle: React.FC<MainContCircleProps> = ({
   showPetImage = false,
   paddingHorizontal = null,
   paddingVertical = null,
+  isScrolled = false,
 }) => {
+  const Container = isScrolled ? ScrollView : View;
+
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -35,9 +39,12 @@ const MainContCircle: React.FC<MainContCircleProps> = ({
         />
       )}
 
-      <View style={{ paddingHorizontal, paddingVertical }}>
+      <Container
+        contentContainerStyle={isScrolled ? { paddingHorizontal, paddingVertical, flexGrow: 1 } : undefined}
+        style={!isScrolled ? { paddingHorizontal, paddingVertical } : undefined}
+      >
         {children}
-      </View>
+      </Container>
     </View>
   );
 };

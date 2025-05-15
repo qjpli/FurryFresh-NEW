@@ -89,7 +89,7 @@ const PetCareReviews = () => {
                     titleSize={dimensions.screenWidth * 0.045}
                 />
             </View>
-            <MainContCircle>
+            <MainContCircle isScrolled={true}>
                 {
                     isInitializing ? <>
                         <View style={[styles.card, { justifyContent: 'space-between', flexDirection: 'row', alignItems: 'flex-start' }]}>
