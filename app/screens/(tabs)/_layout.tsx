@@ -33,7 +33,7 @@ export default () => {
 
   return (
     <PortalProvider>
-      <NavigationContainer>
+      {/* <NavigationContainer> */}
         <Tab.Navigator
           screenOptions={{
             tabBarShowLabel: false,
@@ -46,8 +46,8 @@ export default () => {
               backgroundColor: '#fff',
               position: 'absolute',
               elevation: 15,
-              height: dimensions.screenHeight * 0.1,
-              paddingTop: dimensions.screenHeight * 0.01,
+              height: dimensions.screenHeight * 0.11,
+              paddingTop: dimensions.screenHeight * 0.015,
               shadowColor: '#000',
               shadowOffset: { width: 0, height: -30 },
               shadowOpacity: 0.1,
@@ -62,7 +62,7 @@ export default () => {
             component={HomeWithAnimation}
             options={{
               tabBarIcon: ({ color }: { color: string }) => (
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', width: dimensions.screenWidth * 0.25 }}>
                   <NavbarItem
                     color={color}
                     title="Home"
@@ -80,7 +80,7 @@ export default () => {
             component={ExploreWithAnimation}
             options={{
               tabBarIcon: ({ color }: { color: string }) => (
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', width: dimensions.screenWidth * 0.25 }}>
                   <NavbarItem
                     color={color}
                     title="Explore"
@@ -96,7 +96,7 @@ export default () => {
             component={ActivityWithAnimation}
             options={{
               tabBarIcon: ({ color }: { color: string }) => (
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', width: dimensions.screenWidth * 0.25 }}>
                   <NavbarItem
                     color={color}
                     title="Activity"
@@ -115,7 +115,7 @@ export default () => {
             component={ProfileWithAnimation}
             options={{
               tabBarIcon: ({ color }: { color: string }) => (
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', width: dimensions.screenWidth * 0.25 }}>
                   <NavbarItem
                     color={color}
                     title="Profile"
@@ -127,7 +127,7 @@ export default () => {
             }}
           />
         </Tab.Navigator>
-      </NavigationContainer>
+      {/* </NavigationContainer> */}
     </PortalProvider>
   );
 };

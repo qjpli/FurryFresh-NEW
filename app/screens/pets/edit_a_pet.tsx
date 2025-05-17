@@ -11,7 +11,8 @@ import {
     KeyboardAvoidingView,
     Keyboard,
     TouchableWithoutFeedback,
-    Switch
+    Switch,
+    SafeAreaView
 } from "react-native";
 import { petsStyles } from "./components/petsStyles";
 import { Ionicons } from "@expo/vector-icons";
@@ -194,7 +195,7 @@ const EditPet = ({ back, pet }: EditPetProps) => {
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <KeyboardAvoidingView behavior="padding" style={petsStyles.addPetContainer}>
-                <View style={{ zIndex: 1 }}>
+                <SafeAreaView style={{ zIndex: 1, backgroundColor: 'white' }}>
                     <AppbarDefault
                         title="Edit Pet"
                         session={session}
@@ -203,7 +204,7 @@ const EditPet = ({ back, pet }: EditPetProps) => {
                         leadingChildren={null}
                         titleSize={dimensions.screenWidth * 0.045}
                     />
-                </View>
+                </SafeAreaView>
                 <MainContPaw>
                     {/* Photo Upload */}
                     <View style={styles.photoUploadContainer}>

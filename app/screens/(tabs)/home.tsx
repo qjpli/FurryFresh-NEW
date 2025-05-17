@@ -43,6 +43,7 @@ import { useGrooming } from "../../context/grooming_context";
 import Subcategories from "../../interfaces/subcategories";
 import { Grooming } from "../../interfaces/grooming";
 import { useSession } from "../../context/sessions_context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type Service = {
   id: number;
@@ -855,7 +856,7 @@ const styles = StyleSheet.create({
 
 export const homeOptions = {
   header: (session: Session | null) => (
-    <View style={styles.header}>
+    <SafeAreaView style={styles.header} edges={['top']}>
       <View style={styles.headerLeft}>
         <TouchableOpacity
           onPress={() => router.push("../(tabs)/profile")}
@@ -886,6 +887,6 @@ export const homeOptions = {
       >
         <Ionicons name="paw-outline" size={24} color="#000" />
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   ),
 };

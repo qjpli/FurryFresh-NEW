@@ -214,7 +214,7 @@ const AddPet = (addPet: AddPetProps) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <KeyboardAvoidingView style={[petsStyles.addPetContainer]}>
-        <View style={{ zIndex: 1 }}>
+        <SafeAreaView style={{ zIndex: 1, backgroundColor: 'white' }}>
           <AppbarDefault
             title="Add a Pet"
             session={session}
@@ -226,7 +226,7 @@ const AddPet = (addPet: AddPetProps) => {
             }}
             titleSize={dimensions.screenWidth * 0.045}
           />
-        </View>
+        </SafeAreaView>
 
         <MainContPaw>
           {/* Photo Upload */}

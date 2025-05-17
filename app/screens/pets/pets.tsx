@@ -402,7 +402,7 @@ const PetsMain = () => {
         style={[petsStyles.addButton,
         {
           position: 'absolute',
-          bottom: dimensions.screenHeight * 0.13,
+          bottom: dimensions.screenHeight * 0.18,
           left: dimensions.screenWidth * 0.07,
           right: dimensions.screenWidth * 0.07,
           backgroundColor: '#466AA2',

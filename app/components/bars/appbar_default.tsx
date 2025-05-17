@@ -51,6 +51,7 @@ const AppbarDefault = ({
 
   return (
     <SafeAreaView
+      edges={['top']}
       style={[
         styles.container,
         {

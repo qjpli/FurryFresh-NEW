@@ -56,7 +56,7 @@ const Home = () => {
 
       setTimeout(function () {
         openSheet();
-      }, 2000);
+      }, 100);
     }
   }, []);
 

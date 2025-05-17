@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Platform,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  SafeAreaView
 } from "react-native";
 import React, { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import MainContPaw from "../../components/general/background_paw";
@@ -185,7 +186,7 @@ const Profile = () => {
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
           <View style={styles.topContainer}>
-            <View style={styles.titlePage}>
+            <SafeAreaView style={styles.titlePage}>
               <View style={{ flex: 1 }}></View>
               <Text style={styles.titleText}>Profile</Text>
               <View style={styles.iconContainer}>
@@ -205,7 +206,7 @@ const Profile = () => {
                   />
                 </TouchableOpacity>
               </View>
-            </View>
+            </SafeAreaView>
             <View style={styles.profileContainer}>
               <View style={styles.profilePicContainer}>
                 <View style={styles.profilePic}>
