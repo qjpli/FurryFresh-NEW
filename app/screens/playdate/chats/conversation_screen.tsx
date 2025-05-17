@@ -58,14 +58,15 @@ const ConversationScreen = () => {
         <View style={conversationScreenStyles.container}>
             <AppbarDefault
                 session={session}
-                titleSize={0}
+                title="Conversations"
+                titleSize={dimensions.screenSize * 0.015}
                 leadingChildren={null}
                 showLeading={false}
             />
             <MainContPlain>
                 <Spacer height={dimensions.screenHeight * 0.01} />
                 <View style={conversationScreenStyles.convoBox}>
-                    <Text style={conversationScreenStyles.convoTitle}>Conversations</Text>
+                 
                     <View style={conversationScreenStyles.menuRow}>
                         <TouchableOpacity onPress={() => setFilterType("all")}>
                             <Text

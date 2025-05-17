@@ -50,6 +50,15 @@ const Home = () => {
   const petDetailsRef = useRef<BottomSheet>(null);
   const petDetailsSnapPoints = useMemo(() => ["80%"], []);
 
+  useEffect(() => {
+    if (selectedPet === null) {
+      console.log('nullll')
+
+      setTimeout(function () {
+        openSheet();
+      }, 2000);
+    }
+  }, []);
 
 
   const { newMessages } = useMessages();
@@ -207,10 +216,11 @@ const Home = () => {
   );
 
   const selectPetHandleSheetChange = (index: number) => {
-    if (index === 0) {
+    if (index === -1) {
       selectPetRef.current?.close();
     }
   };
+
 
   const petDetailsHandleSheetChange = (index: number) => {
     if (index === 0) {
@@ -276,18 +286,6 @@ const Home = () => {
       fetchPets();
     }
   }, [selectedPet]);
-
-
-
-  useEffect(() => {
-    if (selectedPet === null) {
-      console.log('nullll')
-
-      setTimeout(function () {
-        openSheet(); 
-      }, 2000);
-    }
-  }, []);
 
   return (
     <PortalProvider>
@@ -677,7 +675,7 @@ const styles = StyleSheet.create({
     paddingTop: dimensions.screenHeight * 0.05,
     paddingHorizontal: 20,
     position: 'relative',
-  }, 
+  },
   petItemCont: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -776,7 +774,7 @@ const styles = StyleSheet.create({
   },
   petImage: {
     width: dimensions.screenWidth * 0.5,
-    height:  dimensions.screenHeight * 0.2,
+    height: dimensions.screenHeight * 0.2,
     backgroundColor: '#F5F5F5',
     borderRadius: 15,
     marginBottom: 10,
