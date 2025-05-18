@@ -43,7 +43,7 @@ const OrderItem = ({ item }: OrderItemProps) => {
         position: 'absolute',
         top: dimensions.screenHeight * 0.015,
         right: dimensions.screenWidth * 0.02,
-        backgroundColor: item.status != 'completed' ? '#ED7964' : 'green',
+        backgroundColor: item.status.toLowerCase() != 'completed' ? '#ED7964' : 'green',
         paddingHorizontal: dimensions.screenWidth * 0.03,
         paddingVertical: dimensions.screenHeight * 0.001,
         borderRadius: 30

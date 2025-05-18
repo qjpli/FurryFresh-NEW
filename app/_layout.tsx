@@ -8,7 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import supabase from "./utils/supabase";
 import { Session } from "@supabase/supabase-js";
 import AppbarDefault from "./components/bars/appbar_default";
-import { RouteProp } from "@react-navigation/native";
+import { ParamListBase, RouteProp } from "@react-navigation/native";
 import dimensions from "../app/utils/sizing";
 import { SessionProvider } from "./context/sessions_context";
 import { CartProvider } from "./context/cart_context";
@@ -172,26 +172,21 @@ const RootLayout = () => {
               />
               <Stack.Screen
                 name="screens/shop/shop"
-                options={({
-                  route,
-                }: {
-                  route: RouteProp<Record<string, { title?: string }>, string>;
-                }) => {
-                  const titleParam = route?.params?.title;
-                  const title =
-                    typeof titleParam === "string" ? titleParam : "Shop";
+                options={({ route }) => {
+                  const { title } = route.params as { title?: string } || {};
+                  const resolvedTitle = typeof title === "string" ? title : "Shop";
 
                   return {
                     header: () => (
                       <AppbarDefault
-                        title={title}
+                        title={resolvedTitle}
                         session={session}
                         showLeading={false}
                         leadingChildren={undefined}
                         titleSize={dimensions.screenWidth * 0.045}
                       />
                     ),
-                    headerShown: false
+                    headerShown: false,
                   };
                 }}
               />
@@ -249,6 +244,10 @@ const RootLayout = () => {
               />
               <Stack.Screen
                 name="screens/orders/confirm_order"
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="screens/orders/order_completed"
                 options={{ headerShown: false }}
               />
               <Stack.Screen

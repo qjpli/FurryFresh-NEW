@@ -53,7 +53,7 @@ const Activity = () => {
 
   const filteredActivities = allActivities.filter((activity) => {
     const isCorrectStatus =
-      selectedTab === 'ongoing' ? activity.status !== 'completed' : activity.status === 'completed';
+      selectedTab === 'ongoing' ? activity.status.toLowerCase() !== 'completed' : activity.status.toLowerCase() === 'completed';
 
     const isCorrectCategory =
       selectedMenu === 'all' || activity.category === selectedMenu;
@@ -74,17 +74,17 @@ const Activity = () => {
       >
         <View style={styles.tabContainer}>
           <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('ongoing')}>
-            <Text style={[styles.tabText, selectedTab === 'ongoing' && styles.tabTextActive]}>
+            <Text style={[styles.tabText, selectedTab.toLowerCase() === 'ongoing' && styles.tabTextActive]}>
               Ongoing
             </Text>
             {selectedTab === 'ongoing' && <View style={styles.underline} />}
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.tab} onPress={() => setSelectedTab('completed')}>
-            <Text style={[styles.tabText, selectedTab === 'completed' && styles.tabTextActive]}>
+            <Text style={[styles.tabText, selectedTab.toLowerCase() === 'completed' && styles.tabTextActive]}>
               Completed
             </Text>
-            {selectedTab === 'completed' && <View style={styles.underline} />}
+            {selectedTab.toLowerCase() === 'completed' && <View style={styles.underline} />}
           </TouchableOpacity>
         </View>
       </AppbarDefault>

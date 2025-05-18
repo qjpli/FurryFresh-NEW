@@ -11,6 +11,9 @@ import {
   Platform,
   UIManager,
   Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import dimensions from '../../utils/sizing';
@@ -82,7 +85,7 @@ const ReviewComponent = () => {
     const { error } = await supabase.from('review_ratings').insert([
       {
         user_id: userId,
-        ref_id: refId, 
+        ref_id: refId,
         service_product_id: serviceProductId,
         type: type,
         rating: rating,
@@ -96,7 +99,6 @@ const ReviewComponent = () => {
       Alert.alert('Review submission failed', error.message);
     } else {
       router.back();
-      Alert.prompt('Review submitted!');
     }
   };
 
@@ -106,76 +108,78 @@ const ReviewComponent = () => {
   });
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', backgroundColor: '#fff' }}>
-      <View style={reviewStyles.container}>
-        <Animated.View
-          style={[
-            reviewStyles.starsContainer,
-            { transform: [{ translateY: starTranslateY }] },
-          ]}
-        >
-          <ReviewIcon width={dimensions.screenWidth * 0.2} height={dimensions.screenWidth * 0.2} style={{ alignSelf: 'center', marginBottom: 20 }} />
-          <Text style={reviewStyles.promptText}>
-            {showComment ? 'How was your experience?' : ratingTexts[rating - 1] || 'How was your experience?'}
-          </Text>
-          <Text style={reviewStyles.promptSubtitle}>
-            {showComment ? ratingTexts[rating - 1] || 'Rate your experience with the service' : 'How was your experience?'}
-          </Text>
-          <View style={reviewStyles.starsRow}>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <TouchableOpacity
-                key={`star-${star}`}
-                onPress={() => handleStarPress(star)}
-                activeOpacity={0.7}
-              >
-                <Ionicons
-                  name={star <= rating ? 'star' : 'star-outline'}
-                  size={40}
-                  color={star <= rating ? 'orange' : '#CCCCCC'}
-                />
-              </TouchableOpacity>
-            ))}
-          </View>
-        </Animated.View>
-
-        {showComment && (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView style={{ flex: 1, justifyContent: 'center', backgroundColor: '#fff' }}>
+        <View style={reviewStyles.container}>
           <Animated.View
             style={[
-              reviewStyles.commentContainer,
-              {
-                opacity: starPosition,
-                transform: [
-                  {
-                    translateY: starPosition.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [20, 0],
-                    }),
-                  },
-                ],
-              },
+              reviewStyles.starsContainer,
+              { transform: [{ translateY: starTranslateY }] },
             ]}
           >
-            <Text style={reviewStyles.commentPrompt}>Tell us more about your experience</Text>
-            <TextInput
-              style={reviewStyles.commentInput}
-              multiline
-              numberOfLines={4}
-              placeholder=""
-              value={comment}
-              onChangeText={setComment}
-            />
-            <Button1
-              title={loading ? 'Submitting...' : 'Submit Review'}
-              isPrimary={false}
-              borderRadius={15}
-              onPress={() => {
-                if (!loading) handleSubmit();
-              }}
-            />
+            <ReviewIcon width={dimensions.screenWidth * 0.2} height={dimensions.screenWidth * 0.2} style={{ alignSelf: 'center', marginBottom: 20 }} />
+            <Text style={reviewStyles.promptText}>
+              {showComment ? 'How was your experience?' : ratingTexts[rating - 1] || 'How was your experience?'}
+            </Text>
+            <Text style={reviewStyles.promptSubtitle}>
+              {showComment ? ratingTexts[rating - 1] || 'Rate your experience with the service' : 'How was your experience?'}
+            </Text>
+            <View style={reviewStyles.starsRow}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <TouchableOpacity
+                  key={`star-${star}`}
+                  onPress={() => handleStarPress(star)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons
+                    name={star <= rating ? 'star' : 'star-outline'}
+                    size={40}
+                    color={star <= rating ? 'orange' : '#CCCCCC'}
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
           </Animated.View>
-        )}
-      </View>
-    </View>
+
+          {showComment && (
+            <Animated.View
+              style={[
+                reviewStyles.commentContainer,
+                {
+                  opacity: starPosition,
+                  transform: [
+                    {
+                      translateY: starPosition.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [20, 0],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              <Text style={reviewStyles.commentPrompt}>Tell us more about your experience</Text>
+              <TextInput
+                style={reviewStyles.commentInput}
+                multiline
+                numberOfLines={4}
+                placeholder=""
+                value={comment}
+                onChangeText={setComment}
+              />
+              <Button1
+                title={loading ? 'Submitting...' : 'Submit Review'}
+                isPrimary={false}
+                borderRadius={15}
+                onPress={() => {
+                  if (!loading) handleSubmit();
+                }}
+              />
+            </Animated.View>
+          )}
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
