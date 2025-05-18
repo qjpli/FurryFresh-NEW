@@ -29,6 +29,7 @@ import { Voucher } from '../../interfaces/voucher';
 import Paypal from '../../components/payments/paypal';
 import { StackActions } from '@react-navigation/native';
 import { useBooking } from '../../context/booking_context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 type Pet = {
@@ -160,7 +161,7 @@ const ConfirmScheduling = () => {
         }
       }
 
-      router.replace({ 
+      router.replace({
         pathname: './success_booking',
         params: {
           booking: JSON.stringify(bookingResult),
@@ -341,16 +342,18 @@ const ConfirmScheduling = () => {
     <PortalProvider>
       <View style={{ height: '100%', backgroundColor: '#F8F8FF' }}>
         {(
-          <AppbarDefault
-            title="Confirm Booking"
-            zIndex={0}
-            subtitleSize={dimensions.screenWidth * 0.03}
-            subtitleFont="Poppins-Regular"
-            session={session}
-            showLeading={false}
-            leadingChildren
-            titleSize={dimensions.screenWidth * 0.045}
-          />
+          <SafeAreaView>
+            <AppbarDefault
+              title="Confirm Booking"
+              zIndex={0}
+              subtitleSize={dimensions.screenWidth * 0.03}
+              subtitleFont="Poppins-Regular"
+              session={session}
+              showLeading={false}
+              leadingChildren
+              titleSize={dimensions.screenWidth * 0.045}
+            />
+          </SafeAreaView>
         )}
         <MainContPlain>
           <View style={styles.cont1}>

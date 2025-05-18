@@ -289,7 +289,7 @@ const ConfirmOrder = (props: Props) => {
                 router.replace({
                     pathname: './order_completed',
                     params: {
-                        booking: JSON.stringify(orderResult),
+                        order: JSON.stringify(orderResult),
                         payment: JSON.stringify(paymentResult),
                     }
                 });
