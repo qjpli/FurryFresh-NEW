@@ -52,11 +52,10 @@ const Home = () => {
 
   useEffect(() => {
     if (selectedPet === null) {
-      console.log('nullll')
 
       setTimeout(function () {
         openSheet();
-      }, 2000);
+      }, 100);
     }
   }, []);
 
